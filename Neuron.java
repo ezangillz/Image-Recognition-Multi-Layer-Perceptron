@@ -1,31 +1,45 @@
 import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Neuron implements Serializable {
 
+    private static final double minRange = -0.5;
+    private static final double maxRange = 0.5;
+
+    private double delta;
+    private double sum;
+    private double output;
+    private double[] inputs;
     private double[] weights;
-    private double bias;
 
-    public void generate(int numberOfInputs) {
-
+    Neuron(int capacity) {
+        weights = new double[capacity];
+        for (int i = 0; i < capacity; i++)
+            weights[i] = ThreadLocalRandom.current().nextDouble(minRange, maxRange + 1);
+        delta = 0;
+        output = 0;
     }
 
-    /**
-     * Takes inputs, multiplies each input by each weight and adds bias, activates it and returns the output
-     */
-    public double[] calculate(double[] inputs) {
-        return null;
+    double activate(double[] inputs) {
+        this.inputs = inputs;
+        sum = 0;
+        for (int i = 0; i < inputs.length; i++)
+            sum += weights[i] * inputs[i];
+        output = 1.0 / (1.0 + (Math.exp(-sum)));
+        return output;
     }
 
-    private double sumUp(double[] inputs) {
-        return 0.0;
+    void correctWeights(double momentum, double learningRate) {
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = weights[i] * momentum + learningRate * delta * (output * (1 - output))  * inputs[i];
+
+        }
     }
 
-    private double sigmoid(double sum) {
-        return 0.0;
-    }
+    double getOutput() { return output; }
+    double getDelta() {return delta; }
+    double getWeight(int number) { return weights[number]; }
 
-    private double relearn(double delta) {
-        return 0.0;
-    }
+    void setDelta(double value) { this.delta = value; }
 
 }
